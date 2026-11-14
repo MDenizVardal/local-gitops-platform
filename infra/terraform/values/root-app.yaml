@@ -1,0 +1,17 @@
+# The root Application watches deploy/argocd/apps on main. Every manifest in that folder
+# is itself an Application, so adding an app to the cluster is a Git commit.
+applications:
+  root:
+    namespace: argocd
+    project: default
+    source:
+      repoURL: https://github.com/MDenizVardal/local-gitops-platform.git
+      targetRevision: main
+      path: deploy/argocd/apps
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: argocd
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true

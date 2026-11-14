@@ -1,0 +1,27 @@
+server:
+  service:
+    type: NodePort
+    nodePortHttps: 30443 # https://localhost:8443
+    nodePortHttp: 30081  # the chart's default is 30080, which the shortener uses
+
+configs:
+  cm:
+    # Argo CD doesn't assess the health of Application resources by default. This check
+    # reports a child app's own health, so sync waves between child apps actually wait.
+    resource.customizations.health.argoproj.io_Application: |
+      hs = {}
+      hs.status = "Progressing"
+      hs.message = ""
+      if obj.status ~= nil and obj.status.health ~= nil then
+        hs.status = obj.status.health.status
+        if obj.status.health.message ~= nil then
+          hs.message = obj.status.health.message
+        end
+      end
+      return hs
+
+# Not used here: no SSO and no notifications.
+dex:
+  enabled: false
+notifications:
+  enabled: false
